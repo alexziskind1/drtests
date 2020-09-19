@@ -1,0 +1,13 @@
+<div>
+  <h2>Wrapped dynamic items</h2>
+  <ng-template #viewContainerRef></ng-template>
+
+  <h2>Dynamic items</h2>
+  <ng-container
+    dynamicItem
+    *ngFor="let componentType of dynComponentTypes"
+    [componentType]="componentType"
+  ></ng-container>
+
+  <h2>dynamic item html dumped on document</h2>
+</div>
