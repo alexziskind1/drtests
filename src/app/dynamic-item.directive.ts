@@ -10,6 +10,7 @@ import {
   Type,
   ViewContainerRef,
 } from '@angular/core';
+import { DynamicComponentBase } from './dynamic-component.base';
 
 export interface DynItemWithRenderedHtml {
   html: string;
@@ -18,11 +19,9 @@ export interface DynItemWithRenderedHtml {
 
 @Directive({ selector: '[dynamicItem]' })
 export class DynamicItemDirective implements OnInit, AfterViewInit {
-  @Input() componentType: Type<any>;
+  @Input() componentType: Type<DynamicComponentBase>;
 
-  @Output() itemCreated: EventEmitter<
-    DynItemWithRenderedHtml
-  > = new EventEmitter();
+  @Output() itemCreated: EventEmitter<boolean> = new EventEmitter();
 
   constructor(
     private resolver: ComponentFactoryResolver,
@@ -32,8 +31,14 @@ export class DynamicItemDirective implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const factory = this.resolver.resolveComponentFactory(this.componentType);
-    const componentRef = this.viewContainerRef.createComponent(factory);
+    const componentRef = this.viewContainerRef.createComponent<
+      DynamicComponentBase
+    >(factory);
     componentRef.changeDetectorRef.detectChanges();
+
+    componentRef.instance.itemCreated.subscribe(() => {
+      this.itemCreated.emit(true);
+    });
   }
 
   ngAfterViewInit(): void {}

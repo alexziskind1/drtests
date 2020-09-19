@@ -9,6 +9,7 @@ import {
   OnInit,
   AfterViewInit,
 } from '@angular/core';
+import { IDataItem } from './data';
 import { DynamicComponentBase } from './dynamic-component.base';
 import { DynItemWithRenderedHtml } from './dynamic-item.directive';
 import { WrapperComponent } from './wrapper.component';
@@ -22,6 +23,7 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
   viewContainerRef: ViewContainerRef;
 
   @Input() dynComponentTypes: Type<DynamicComponentBase>[] = [];
+  @Input() dynItems: IDataItem[] = [];
 
   count = 0;
   componentsReferences = Array<ComponentRef<WrapperComponent>>();
@@ -29,12 +31,13 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
   constructor(private resolver: ComponentFactoryResolver) {}
 
   ngAfterViewInit(): void {
-    this.dynComponentTypes.map((t) => this.createComponent(t));
+    // this.dynComponentTypes.map((t) => this.createComponent(t));
+    this.dynItems.map((i) => this.createComponent(i));
   }
 
   ngOnInit(): void {}
 
-  createComponent(t: Type<DynamicComponentBase>): void {
+  createComponent(i: IDataItem): void {
     const wrapperFactory = this.resolver.resolveComponentFactory(
       WrapperComponent
     );
@@ -43,7 +46,8 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
       wrapperFactory
     );
     wrapperComponentRef.instance.id = ++this.count;
-    wrapperComponentRef.instance.componentType = t;
+    wrapperComponentRef.instance.deferRender = i.deferRender;
+    wrapperComponentRef.instance.componentType = i.componentType;
     wrapperComponentRef.instance.itemCreated.subscribe((d) =>
       this.onItemCreated(d)
     );
@@ -53,7 +57,7 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
 
   /*
   remove(key: number): void {
-    if (this.VCR.length < 1) {
+    if (this.viewContainerRef.length < 1) {
       return;
     }
 
@@ -61,10 +65,10 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
       (x) => x.instance.id === key
     )[0];
 
-    const vcrIndex: number = this.VCR.indexOf(componentRef.hostView);
+    const viewContainerRefIndex: number = this.viewContainerRef.indexOf(componentRef.hostView);
 
     // removing component from container
-    this.VCR.remove(vcrIndex);
+    this.viewContainerRef.remove(viewContainerRefIndex);
 
     // removing component from the list
     this.componentsReferences = this.componentsReferences.filter(
@@ -74,15 +78,14 @@ export class DesignSurfaceComponent implements OnInit, AfterViewInit {
   */
 
   public onItemCreated(d: DynItemWithRenderedHtml): void {
-    console.log(d.html);
-
-    setTimeout(() => {
-      document.body.appendChild(createElementFromHTML(d.html));
-    }, 300);
+    document.body.appendChild(createElementFromHTML(d.html));
 
     this.count--;
+
     if (this.count === 0) {
-      // this.VCR.clear();
+      setTimeout(() => {
+        this.viewContainerRef.clear();
+      }, 3000);
     }
   }
 }

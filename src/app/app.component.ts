@@ -1,6 +1,6 @@
 import { Component, OnInit, Type } from '@angular/core';
 
-import { DATA } from './data';
+import { DATA, IDataItem } from './data';
 import { DynamicComponentBase } from './dynamic-component.base';
 
 @Component({
@@ -10,10 +10,12 @@ import { DynamicComponentBase } from './dynamic-component.base';
 })
 export class AppComponent implements OnInit {
   dynComponentTypes: Type<DynamicComponentBase>[] = [];
+  dynItems: IDataItem[] = [];
 
   public ngOnInit(): void {
     DATA.components.map((c) => {
       this.dynComponentTypes.push(c.componentType);
+      this.dynItems.push(c);
     });
   }
 }

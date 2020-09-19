@@ -17,4 +17,9 @@ export class TextAreaComponent extends DynamicComponentBase implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    console.log('sdfdsdsfdsf');
+    this.itemCreated.emit(true);
+  }
 }

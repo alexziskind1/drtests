@@ -4,7 +4,10 @@ import { DynamicComponentBase } from '../dynamic-component.base';
 @Component({
   selector: 'app-chart',
   template: `
-    <kendo-chart [categoryAxis]="{ categories: categories }">
+    <kendo-chart
+      [categoryAxis]="{ categories: categories }"
+      (render)="onRender($event)"
+    >
       <kendo-chart-title
         text="Gross domestic product growth /GDP annual %/"
       ></kendo-chart-title>
@@ -90,4 +93,9 @@ export class ChartComponent extends DynamicComponentBase {
     2010,
     2011,
   ];
+
+  public onRender(e): void {
+    console.log('chart render event');
+    this.itemCreated.emit(true);
+  }
 }
